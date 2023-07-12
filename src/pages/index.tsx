@@ -148,7 +148,18 @@ export default function Home() {
       })
     );
 
-    console.log(blockedPieces);
+    if (blockedPieces.black == blockedPieces.blacktotal) {
+      setActivePiece({ ...activePiece, colour: "black" });
+    }
+    if (blockedPieces.white == blockedPieces.whitetotal) {
+      setActivePiece({ ...activePiece, colour: "white" });
+    }
+    if (
+      blockedPieces.black == blockedPieces.blacktotal &&
+      blockedPieces.white == blockedPieces.whitetotal
+    ) {
+      setActivePiece({ ...activePiece, colour: "empty" });
+    }
     if (
       blockedPieces.black == blockedPieces.blacktotal ||
       blockedPieces.white == blockedPieces.whitetotal
@@ -398,7 +409,10 @@ export default function Home() {
         {turnState == "end" && (
           <div className="absolute left-0 top-0 flex h-full w-full justify-center bg-black/50 p-12 align-middle text-8xl font-bold text-white backdrop-blur-sm">
             <span>
-              endeee. {turnCount % 2 == 0 ? "black" : "white"} hat gewonnen
+              endeee. {activePiece.colour == "black" && <>white</>}{" "}
+              {activePiece.colour == "white" && <>black</>}{" "}
+              {activePiece.colour == "empty" && <>niemand</>} hat gewonnen{" "}
+              {activePiece.colour == "empty" && <>#klimawandel</>}
             </span>
           </div>
         )}
