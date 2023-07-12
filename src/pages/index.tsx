@@ -108,14 +108,53 @@ export default function Home() {
       i++;
     }
 
-    // todo: wenn keine felder mehr übrig, beenden
-    const list: boolean[] = [];
-    tempDots.forEach((row) => {
-      list.push(...row.filter((field) => field == true));
-    });
-    if (list.length == 0) setTurnState("end");
-
     setDots([...tempDots]);
+  };
+
+  const checkLooseCondition = () => {
+    const isBlocked = (i: number, j: number) => {
+      return (
+        board[i - 1]?.[j - 1] != "empty" &&
+        board[i - 1]?.[j] != "empty" &&
+        board[i - 1]?.[(j = 1)] != "empty" &&
+        board[i]?.[j - 1] != "empty" &&
+        board[i]?.[j + 1] != "empty" &&
+        board[i + 1]?.[j - 1] != "empty" &&
+        board[i + 1]?.[j] != "empty" &&
+        board[i + 1]?.[j + 1] != "empty"
+      );
+    };
+    const blockedPieces = {
+      black: 0,
+      blacktotal: 0,
+      white: 0,
+      whitetotal: 0,
+    };
+
+    board.forEach((row, rowindex) =>
+      row.forEach((field, colindex) => {
+        if (field == "black") {
+          blockedPieces.blacktotal++;
+          if (isBlocked(rowindex, colindex)) {
+            blockedPieces.black++;
+          }
+        }
+        if (field == "white") {
+          blockedPieces.whitetotal++;
+          if (isBlocked(rowindex, colindex)) {
+            blockedPieces.white++;
+          }
+        }
+      })
+    );
+
+    console.log(blockedPieces);
+    if (
+      blockedPieces.black == blockedPieces.blacktotal ||
+      blockedPieces.white == blockedPieces.whitetotal
+    ) {
+      setTurnState("end");
+    }
   };
 
   const movePiece = (toRow: number, toCol: number) => {
@@ -218,6 +257,8 @@ export default function Home() {
 
     setTurnState("move");
     setTurnCount(turnCount + 1);
+
+    checkLooseCondition();
   };
 
   return (
@@ -229,23 +270,31 @@ export default function Home() {
         <div>it&apos;s {turnCount % 2 == 0 ? `white's` : `black's`} turn</div>
 
         {/* board */}
-        <div className="relative grid grid-cols-6 gap-4 text-6xl">
+        <div className="relative mx-auto grid aspect-square max-h-[90vh] max-w-[90vw] grid-cols-6 text-6xl shadow-lg">
           {board.map((row, rowindex) => {
             return row.map((field, colindex) => {
               if (field == "empty")
                 return (
                   <div
                     key={`${rowindex}-${colindex}`}
-                    className="bg-orange-50 p-4"
+                    className={`p-4 ${
+                      (rowindex + colindex) % 2 == 0
+                        ? "bg-white"
+                        : "rounded-lg bg-orange-100"
+                    }`}
                   >
-                    🟨
+                    &nbsp;
                   </div>
                 );
               if (field == "black")
                 return (
                   <div
                     key={`${rowindex}-${colindex}`}
-                    className="bg-orange-50 p-4"
+                    className={`flex items-center justify-center p-4 ${
+                      (rowindex + colindex) % 2 == 0
+                        ? "bg-white"
+                        : "bg-orange-100"
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       if (turnCount % 2 == 1)
@@ -260,7 +309,11 @@ export default function Home() {
                 return (
                   <div
                     key={`${rowindex}-${colindex}`}
-                    className="bg-orange-50 p-4"
+                    className={`flex items-center justify-center p-4 ${
+                      (rowindex + colindex) % 2 == 0
+                        ? "bg-white"
+                        : "bg-orange-100"
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       if (turnCount % 2 == 0)
@@ -275,7 +328,11 @@ export default function Home() {
                 return (
                   <div
                     key={`${rowindex}-${colindex}`}
-                    className="bg-red-50 p-4"
+                    className={`flex items-center justify-center bg-red-50 p-4 ${
+                      (rowindex + colindex) % 2 == 0
+                        ? "bg-red-50"
+                        : "rounded-lg bg-red-100"
+                    }`}
                   >
                     🔥
                   </div>
@@ -285,25 +342,25 @@ export default function Home() {
           })}
 
           {/* where to move */}
-          <div className="pointer-events-none absolute grid h-full w-full grid-cols-6 gap-4">
+          <div className="pointer-events-none absolute grid h-full w-full grid-cols-6">
             {dots.map((row, rowindex) =>
               row.map((field, colindex) => {
                 if (field)
                   return (
                     <div
-                      className="pointer-events-auto"
+                      className="pointer-events-auto flex items-center justify-center"
                       key={`${rowindex}-${colindex}`}
                       onClick={(e) => {
                         e.preventDefault();
                         movePiece(rowindex, colindex);
                       }}
                     >
-                      x
+                      <div className="h-12 w-12 rounded-full bg-black/20"></div>
                     </div>
                   );
                 return (
                   <div key={`${rowindex}-${colindex}`} className="invisible">
-                    x
+                    &nbsp;
                   </div>
                 );
               })
@@ -311,25 +368,27 @@ export default function Home() {
           </div>
 
           {/* arrows */}
-          <div className="pointer-events-none absolute grid h-full w-full grid-cols-6 gap-2 text-5xl">
+          <div className="pointer-events-none absolute grid h-full w-full grid-cols-6 text-5xl">
             {arrowdots.map((row, rowindex) =>
               row.map((field, colindex) => {
                 if (field)
                   return (
                     <div
-                      className="pointer-events-auto"
+                      className="pointer-events-auto relative flex items-center justify-center"
                       key={`${rowindex}-${colindex}`}
                       onClick={(e) => {
                         e.preventDefault();
                         shootArrow(rowindex, colindex);
                       }}
                     >
-                      🏹
+                      <div className="absolute flex h-24 w-24 items-center justify-center rounded-full bg-blue-100/80">
+                        🏹
+                      </div>
                     </div>
                   );
                 return (
                   <div key={`${rowindex}-${colindex}`} className="invisible">
-                    x
+                    &nbsp;
                   </div>
                 );
               })
@@ -339,7 +398,7 @@ export default function Home() {
         {turnState == "end" && (
           <div className="absolute left-0 top-0 flex h-full w-full justify-center bg-black/50 p-12 align-middle text-8xl font-bold text-white backdrop-blur-sm">
             <span>
-              endeee. {turnCount % 2 == 1 ? "white" : "black"} hat gewonnen
+              endeee. {turnCount % 2 == 0 ? "white" : "black"} hat gewonnen
             </span>
           </div>
         )}
