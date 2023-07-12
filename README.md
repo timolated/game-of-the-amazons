@@ -1,5 +1,7 @@
 # diese spiel da
 
+ihr braucht [node](https://nodejs.org) damit das läuft (v18)
+
 starten mit `npm i` (dependencies istallieren) und `npm run dev` (lokal starten)
 
 wichtig ist nur die src/index.tsx datei, der code funktioniert aber 1 zu 1 so in anderen react frameworks und in javascript (müsst die types weglassen)
@@ -11,3 +13,7 @@ wenn ihr das dockerizen wollt: [Docker](https://create.t3.gg/en/deployment/docke
 könnt aber auch ein eigenes machen und euch hieran inspirieren
 
 ist nicht sehr schön, weder vom code oder von der ui, aber es funktioniert
+
+---
+
+## erinnert mich das hier wieder privat zu stellen, sonst wird das ganz schnell gefunden, wenn man danach sucht
