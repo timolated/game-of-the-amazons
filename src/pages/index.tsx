@@ -398,7 +398,7 @@ export default function Home() {
         {turnState == "end" && (
           <div className="absolute left-0 top-0 flex h-full w-full justify-center bg-black/50 p-12 align-middle text-8xl font-bold text-white backdrop-blur-sm">
             <span>
-              endeee. {turnCount % 2 == 0 ? "white" : "black"} hat gewonnen
+              endeee. {turnCount % 2 == 0 ? "black" : "white"} hat gewonnen
             </span>
           </div>
         )}
